@@ -26,6 +26,17 @@ services:
       - "8000:8000"            # map container port to host
 
 
+  frontend:
+    build:
+      context: ./FE           # change this to your frontend folder
+      dockerfile: Dockerfile # the one you showed with nginx
+    container_name: EASY_MEAL_FE
+    ports:
+      - "3000:80"            # map nginx port 80 → host port 3000
+    depends_on:
+      - backend
+
+
 volumes:
   pgdata:
 
