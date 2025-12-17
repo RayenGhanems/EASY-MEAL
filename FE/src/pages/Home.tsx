@@ -2,24 +2,30 @@ import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 
 export default function Home() {
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    const selected = acceptedFiles[0];
-    setFile(selected);
+    setFiles((prev) => [...prev, ...acceptedFiles]);
   }, []);
+
+  const removeFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const clearAll = () => setFiles([]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { "image/*": [] },
-    multiple: false,
+    multiple: true,
   });
 
   const handleUpload = async () => {
-    if (!file) return;
-
+    if (files.length === 0) return;
     const formData = new FormData();
-    formData.append("image", file);
+    files.forEach((file) => {
+      formData.append("images", file);
+    });
 
     try {
       const response = await fetch("http://localhost:8000/easy_meals", {
@@ -38,31 +44,54 @@ export default function Home() {
 
   return (
     <>
-      <h2>Upload your fridge image</h2>
-
       <div
-        {...getRootProps()}
         style={{
-          border: "2px dashed #aaa",
+          backgroundColor: "red",
           padding: "20px",
           textAlign: "center",
-          cursor: "pointer",
+          width: "100%",
+          height: "100%",
         }}
       >
-        <input {...getInputProps()} />
-        {isDragActive
-          ? "Drop the image here…"
-          : "Drag & drop an image here, or click to select"}
-      </div>
+        <h2>Upload your fridge image</h2>
 
-      {file && (
-        <>
-          <p>
-            Selected file: <strong>{file.name}</strong>
-          </p>
-          <button onClick={handleUpload}>Send to Backend</button>
-        </>
-      )}
+        <div
+          {...getRootProps()}
+          style={{
+            border: "2px dashed #aaa",
+            padding: "20px",
+            textAlign: "center",
+            cursor: "pointer",
+          }}
+        >
+          <input {...getInputProps()} />
+          {isDragActive
+            ? "Drop the images here  …"
+            : "Drag & drop some images here, or click to select"}
+        </div>
+
+        {files.length > 0 && (
+          <>
+            <p>
+              Selected files: <strong>{files.length}</strong>
+            </p>
+            <ul style={{ listStyle: "none", padding: 0 }}>
+              {files.map((f, idx) => (
+                <li key={`${f.name}-${f.lastModified}-${idx}`}>
+                  {f.name}{" "}
+                  <button type="button" onClick={() => removeFile(idx)}>
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <button onClick={handleUpload}>Send</button>{" "}
+            <button type="button" onClick={clearAll}>
+              Clear
+            </button>
+          </>
+        )}
+      </div>
     </>
   );
 }
