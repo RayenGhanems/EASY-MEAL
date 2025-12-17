@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import base64 
 
 from app.chain import chain
+from sql.sql_fxns import *
 
 app = FastAPI(title="EASY MEAL API")
 
