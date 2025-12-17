@@ -11,10 +11,7 @@ app = FastAPI(title="EASY MEAL API")
 
 
 # ⭐️ Configure CORS
-origins = [
-    "http://localhost:5173",  # your React dev origin
-    # add other frontend URLs here if needed
-]
+origins = ["http://localhost:5173",]
 
 app.add_middleware(
     CORSMiddleware,
@@ -32,15 +29,19 @@ async def redirect_root_to_docs() -> RedirectResponse:
 # ---------- Image upload endpoint ----------
 
 @app.post("/easy_meals")
-async def analyze_fridge(image: UploadFile = File(...)):
-    image_bytes = await image.read()
-    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+async def analyze_fridge(images: list[UploadFile] = File(...)):
+    imgs = []
 
-    result = chain.invoke({
-        "image_base64": image_base64
-    })
+    for image in images:
+        image_bytes = await image.read()
+        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
 
-    return result.model_dump()
+        imgs.append({"image_base64": image_base64})
+
+    results = chain.batch(imgs)    ### batch is like map but map only changes it you need to re invoke it after while bathch is invoke each elemnt of the list
+
+    return [r.model_dump() for r in results]
+
 
 
 if __name__ == "__main__":
