@@ -133,4 +133,4 @@ CREATE TABLE recipe_tags (
     tag_name VARCHAR(50),
     FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id)
 );
->>>>>>> BE
+
