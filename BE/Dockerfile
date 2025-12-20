@@ -19,4 +19,3 @@ EXPOSE 8000
 
 # Run Uvicorn to start the FastAPI / LangServe server
 CMD ["langchain", "serve", "--host", "0.0.0.0", "--port", "8000"]
-

@@ -1,49 +1,20 @@
-from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import RedirectResponse
-from langserve import add_routes
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-import base64 
-
-from app.chain import chain
-from sql.sql_fxns import *
+from app.routes.auth import router as auth_router
+from app.routes.meals import router as meals_router
 
 app = FastAPI(title="EASY MEAL API")
 
-
-# ⭐️ Configure CORS
-origins = ["http://localhost:5173",]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,       # allow these origins
+    allow_origins=["http://localhost:5173","http://localhost:5174"],
     allow_credentials=True,
-    allow_methods=["*"],         # allow all methods (GET, POST, etc.)
-    allow_headers=["*"],         # allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-
-@app.get("/")
-async def redirect_root_to_docs() -> RedirectResponse:
-    return RedirectResponse("/docs")
-
-# ---------- Image upload endpoint ----------
-
-@app.post("/easy_meals")
-async def analyze_fridge(images: list[UploadFile] = File(...)):
-    imgs = []
-
-    for image in images:
-        image_bytes = await image.read()
-        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
-
-        imgs.append({"image_base64": image_base64})
-
-    results = chain.batch(imgs)    ### batch is like map but map only changes it you need to re invoke it after while bathch is invoke each elemnt of the list
-
-    return [r.model_dump() for r in results]
-
-
+app.include_router(auth_router)
+app.include_router(meals_router)
 
 if __name__ == "__main__":
     import uvicorn
