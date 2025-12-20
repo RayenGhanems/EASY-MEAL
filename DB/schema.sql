@@ -17,3 +17,4 @@ CREATE TABLE ingredients (
         REFERENCES users(id)
         ON DELETE CASCADE
 );
+
