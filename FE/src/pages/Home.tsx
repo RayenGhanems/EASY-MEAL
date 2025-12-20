@@ -30,6 +30,7 @@ export default function Home() {
     try {
       const response = await fetch("http://localhost:8000/easy_meals", {
         method: "POST",
+        credentials: "include",
         body: formData,
       });
 
@@ -46,7 +47,6 @@ export default function Home() {
     <>
       <div
         style={{
-          backgroundColor: "red",
           padding: "20px",
           textAlign: "center",
           width: "100%",
@@ -91,6 +91,21 @@ export default function Home() {
             </button>
           </>
         )}
+      </div>
+      <div>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            border: "1px solid black",
+            borderBlockColor: "#aaa",
+          }}
+        >
+          <tr>
+            <th>Ingredient</th>
+            <th>Quantity</th>
+          </tr>
+        </table>
       </div>
     </>
   );
