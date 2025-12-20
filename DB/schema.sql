@@ -1,9 +1,6 @@
-CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    username VARCHAR(100) NOT NULL,
-    phone_number VARCHAR(15) NOT NULL
+CREATE TABLE dish_types (
+    dish_type_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    dish_type_name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE ingredients (
@@ -139,3 +136,10 @@ CREATE TABLE recipe_tags (
     FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id)
 );
 
+CREATE TABLE user_mhmd (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    username VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(15) NOT NULL
+);
