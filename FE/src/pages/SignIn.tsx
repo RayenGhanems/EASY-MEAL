@@ -35,8 +35,8 @@ export default function SignIn(): JSX.Element {
 
       // If using header-based JWT:
       // localStorage.setItem("access_token", data.access_token!);
-
       console.log("Logged in successfully", data);
+
       // navigate("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unexpected error");
