@@ -103,3 +103,5 @@ python-telegram-bot==21.6
 pandas==2.3.3 
 pytz==2025.2 
 tzdata==2025.3
+rapidfuzz==3.14.3
+duckduckgo_search==8.1.1
