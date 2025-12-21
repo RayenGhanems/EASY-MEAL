@@ -13,32 +13,30 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/signup")
 async def signup_user(user: dict):
-    email = user.get("email")
-    password = user.get("password")
     username = user.get("username")
-    phone_number = user.get("phone_number")
+    password = user.get("password")
 
-    if not email or not password:
+    if not username or not password:
         return {"success": False, "message": "Email and password are required"}
 
-    existing_user = get_user_by_email(email, next(get_session()))
+    existing_user = get_user_by_email(username, next(get_session()))
     if existing_user:
         return {"success": False, "message": "User already exists"}
 
-    create_user(email, hash_password(password), username, phone_number, next(get_session()))
+    create_user(username, hash_password(password), next(get_session()))
     return {"success": True, "message": "User created successfully"}
 
 @router.post("/signin")
 async def signin_user(user: dict, response: Response):
-    email = user.get("email")
+    username = user.get("username")
     password = user.get("password")
 
-    existing_user = get_user_by_email(email, next(get_session()))
+    existing_user = get_user_by_email(username, next(get_session()))
     if not existing_user or not verify_password(password, existing_user.password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
-    access_token = create_access_token(existing_user.id)
-    refresh_token = create_refresh_token(existing_user.id)
+    access_token = create_access_token(existing_user.user_id)
+    refresh_token = create_refresh_token(existing_user.user_id)
 
     # local dev: secure=False (set True in production https)
     response.set_cookie("access_token", access_token, httponly=True, secure=False, samesite="lax",

@@ -1,4 +1,6 @@
 import { useState, type FormEvent, type JSX } from "react";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface LoginResponse {
   access_token?: string;
@@ -7,10 +9,12 @@ interface LoginResponse {
 }
 
 export default function SignIn(): JSX.Element {
-  const [email, setEmail] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,7 +28,7 @@ export default function SignIn(): JSX.Element {
           "Content-Type": "application/json",
         },
         credentials: "include", // if using HttpOnly cookies
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
 
       const data: LoginResponse = await response.json();
@@ -35,6 +39,7 @@ export default function SignIn(): JSX.Element {
 
       // If using header-based JWT:
       // localStorage.setItem("access_token", data.access_token!);
+      navigate("/home", { replace: true });
       console.log("Logged in successfully", data);
 
       // navigate("/dashboard");
@@ -52,8 +57,8 @@ export default function SignIn(): JSX.Element {
 
         <input
           type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           placeholder="Email"
           required
           style={styles.input}
@@ -74,6 +79,8 @@ export default function SignIn(): JSX.Element {
 
         {error && <p style={styles.error}>{error}</p>}
       </form>
+      Create an account?
+      <Link to="/signup"> Sign Up</Link>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useState, type FormEvent, type JSX } from "react";
+import { Link } from "react-router-dom";
 
 interface SignUpResponse {
   message?: string;
@@ -6,9 +7,7 @@ interface SignUpResponse {
 }
 
 export default function SignUp(): JSX.Element {
-  const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [PhoneNumber, setPhoneNumber] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -25,10 +24,8 @@ export default function SignUp(): JSX.Element {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email,
-          password,
           username,
-          phone_number: PhoneNumber,
+          password,
         }),
       });
 
@@ -39,10 +36,8 @@ export default function SignUp(): JSX.Element {
       }
 
       setSuccess("Account created successfully!");
-      setEmail("");
       setUsername("");
       setPassword("");
-      setPhoneNumber("undefined");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unexpected error");
     } finally {
@@ -65,28 +60,10 @@ export default function SignUp(): JSX.Element {
         />
 
         <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-          style={styles.input}
-        />
-
-        <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
-          required
-          style={styles.input}
-        />
-
-        <input
-          type="tel"
-          value={PhoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-          placeholder="Phone Number"
           required
           style={styles.input}
         />
@@ -98,6 +75,8 @@ export default function SignUp(): JSX.Element {
         {error && <p style={styles.error}>{error}</p>}
         {success && <p style={styles.success}>{success}</p>}
       </form>
+      Already have an account?
+      <Link to="/signin"> Sign In</Link>
     </div>
   );
 }

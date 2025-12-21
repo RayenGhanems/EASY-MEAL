@@ -3,28 +3,26 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from pydantic import BaseModel, Field
 from langchain_core.output_parsers import PydanticOutputParser
+from typing import Literal
 
 from dotenv import load_dotenv; load_dotenv()
-
-# from PIL import Image  
-# from IPython.display import display
-
-# fridge_img = Image.open("../Random_Fridge.png")
-
 
 # ---------- Pydantic schema ----------
 
 class Item(BaseModel):
-    item_name: str = Field(
+    ingredient: str = Field(
         ..., description="single-word name of the item (e.g. milk, cheese, apple)"
     )
-    number: int = Field(
+    quantity: int = Field(
         ..., description="number of this item visible in the image"
+    )
+    unit: Literal["kg", "g", "ml", "l", "pcs"] = Field(
+        "kg", description="discribes the unit of mesurment (e.g. kg, g, ml, l, pcs)"
     )
 
 
 class StructuredOutput(BaseModel):
-    fridge: list[Item]
+    ingredients: list[Item]
 
 
 # ---------- Output parser ----------

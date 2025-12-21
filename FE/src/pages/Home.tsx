@@ -1,112 +1,111 @@
-import { useState, useCallback } from "react";
-import { useDropzone } from "react-dropzone";
+import { useNavigate } from "react-router-dom";
 
-export default function Home() {
-  const [files, setFiles] = useState<File[]>([]);
-
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setFiles((prev) => [...prev, ...acceptedFiles]);
-  }, []);
-
-  const removeFile = (index: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const clearAll = () => setFiles([]);
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: { "image/*": [] },
-    multiple: true,
-  });
-
-  const handleUpload = async () => {
-    if (files.length === 0) return;
-    const formData = new FormData();
-    files.forEach((file) => {
-      formData.append("images", file);
-    });
-
-    try {
-      const response = await fetch("http://localhost:8000/easy_meals", {
-        method: "POST",
-        credentials: "include",
-        body: formData,
-      });
-
-      const data = await response.json();
-      console.log("Server response:", data);
-      alert("Upload successful!");
-    } catch (error) {
-      console.error("Upload failed:", error);
-      alert("Upload failed");
-    }
-  };
+export default function Index() {
+  const navigate = useNavigate();
 
   return (
-    <>
-      <div
-        style={{
-          padding: "20px",
-          textAlign: "center",
-          width: "100%",
-          height: "100%",
-        }}
-      >
-        <h2>Upload your fridge image</h2>
+    <div style={styles.page}>
+      {/* Header */}
+      <header style={styles.header}>
+        <h1 style={styles.title}>🍽️ Easy Meal</h1>
+        <p style={styles.subtitle}>Turn your fridge into smart meal ideas</p>
+      </header>
 
-        <div
-          {...getRootProps()}
-          style={{
-            border: "2px dashed #aaa",
-            padding: "20px",
-            textAlign: "center",
-            cursor: "pointer",
-          }}
-        >
-          <input {...getInputProps()} />
-          {isDragActive
-            ? "Drop the images here  …"
-            : "Drag & drop some images here, or click to select"}
+      {/* Main Card */}
+      <main style={styles.main}>
+        <div style={styles.card}>
+          <h2 style={styles.cardTitle}>Scan your fridge</h2>
+          <p style={styles.cardText}>
+            Upload photos of your fridge or ingredients and let Easy Meal
+            analyze what you have.
+          </p>
+
+          <button
+            style={styles.primaryButton}
+            onClick={() => navigate("/upload")}
+          >
+            📸 Upload fridge photos
+          </button>
+
+          <p style={styles.hint}>
+            More features coming soon (recipes, shopping lists, preferences…)
+          </p>
         </div>
-
-        {files.length > 0 && (
-          <>
-            <p>
-              Selected files: <strong>{files.length}</strong>
-            </p>
-            <ul style={{ listStyle: "none", padding: 0 }}>
-              {files.map((f, idx) => (
-                <li key={`${f.name}-${f.lastModified}-${idx}`}>
-                  {f.name}{" "}
-                  <button type="button" onClick={() => removeFile(idx)}>
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <button onClick={handleUpload}>Send</button>{" "}
-            <button type="button" onClick={clearAll}>
-              Clear
-            </button>
-          </>
-        )}
-      </div>
-      <div>
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            border: "1px solid black",
-            borderBlockColor: "#aaa",
-          }}
-        >
-          <tr>
-            <th>Ingredient</th>
-            <th>Quantity</th>
-          </tr>
-        </table>
-      </div>
-    </>
+      </main>
+    </div>
   );
 }
+const styles: Record<string, React.CSSProperties> = {
+  page: {
+    minHeight: "100vh",
+    background: "linear-gradient(135deg, #f8fafc, #eef2f7)",
+    display: "flex",
+    flexDirection: "column",
+  },
+
+  header: {
+    padding: "40px 20px",
+    textAlign: "center",
+  },
+
+  title: {
+    fontSize: "2.5rem",
+    margin: 0,
+    color: "#111827",
+  },
+
+  subtitle: {
+    marginTop: 10,
+    fontSize: "1.1rem",
+    color: "#6b7280",
+  },
+
+  main: {
+    flex: 1,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+
+  card: {
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    padding: 32,
+    width: "100%",
+    maxWidth: 420,
+    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.08)",
+    textAlign: "center",
+  },
+
+  cardTitle: {
+    fontSize: "1.5rem",
+    marginBottom: 12,
+    color: "#111827",
+  },
+
+  cardText: {
+    fontSize: "1rem",
+    color: "#4b5563",
+    marginBottom: 24,
+  },
+
+  primaryButton: {
+    width: "100%",
+    padding: "14px 18px",
+    fontSize: "1rem",
+    fontWeight: 600,
+    borderRadius: 10,
+    border: "none",
+    cursor: "pointer",
+    background: "linear-gradient(135deg, #10b981, #059669)",
+    color: "#ffffff",
+    transition: "transform 0.15s ease, box-shadow 0.15s ease",
+  },
+
+  hint: {
+    marginTop: 20,
+    fontSize: "0.85rem",
+    color: "#9ca3af",
+  },
+};
