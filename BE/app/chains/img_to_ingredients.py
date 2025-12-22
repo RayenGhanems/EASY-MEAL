@@ -6,12 +6,6 @@ from langchain_core.output_parsers import PydanticOutputParser
 
 from dotenv import load_dotenv; load_dotenv()
 
-# from PIL import Image  
-# from IPython.display import display
-
-# fridge_img = Image.open("../Random_Fridge.png")
-
-
 # ---------- Pydantic schema ----------
 
 class Item(BaseModel):
@@ -58,4 +52,4 @@ llm = ChatOpenAI(
 
 # ---------- Runnable chain ----------
 
-chain = prompt | llm | parser
+img_to_ingredients_chain = prompt | llm | parser
