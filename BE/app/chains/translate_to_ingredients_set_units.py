@@ -277,7 +277,7 @@ def verifying_ingredients_chain(user_input: Dict[str, str]) -> List[Dict[str, An
             "amount": round(final_amount, 2),
             "unit": canonical_unit
         })
-
+    
     return rows
 
 

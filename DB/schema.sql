@@ -136,10 +136,11 @@ CREATE TABLE recipe_tags (
     FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id)
 );
 
-CREATE TABLE user_mhmd (
-    id SERIAL PRIMARY KEY,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    username VARCHAR(100) NOT NULL,
-    phone_number VARCHAR(15) NOT NULL
+-- Table to store the ingredients of each user
+CREATE TABLE ingredients_stored (
+    user_id INT,
+    ingredient_id INT,
+    amount NUMERIC NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user(user_id),
+    FOREIGN KEY (ingredient_id) REFERENCES ingredients(ingredient_id)
 );
