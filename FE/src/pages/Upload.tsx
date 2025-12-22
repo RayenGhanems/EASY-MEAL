@@ -3,7 +3,7 @@ import { useDropzone } from "react-dropzone";
 
 type IngredientRow = {
   ingredient: string;
-  quantity: number | string;
+  quantity: number;
   unit: string;
 };
 
@@ -58,9 +58,13 @@ export default function Upload() {
 
       // ---- Normalize backend response into table rows ----
       // Adjust this based on your real backend structure.
-      const backendList =
-        data?.ingredients ?? data?.data?.ingredients ?? data ?? [];
-      console.log("Backend list:", backendList);
+      const backendList = Array.isArray(data)
+        ? data.flatMap((item) =>
+            Array.isArray(item.ingredients) ? item.ingredients : []
+          )
+        : [];
+
+      console.log("Backend ingredient list:", backendList);
 
       const normalized: IngredientRow[] = (
         Array.isArray(backendList) ? backendList : []
@@ -99,16 +103,23 @@ export default function Upload() {
   };
 
   const addRow = () => {
-    setRows((prev) => [...prev, { ingredient: "", quantity: "", unit: "" }]);
+    setRows((prev) => [...prev, { ingredient: "", quantity: 0, unit: "" }]);
   };
 
   const submitTable = async () => {
+    const dict: any = rows.map((r) => ({
+      ingredient: r.ingredient,
+      quantity: r.quantity.toString() + " " + r.unit,
+    }));
+
+    console.log("Submitting table data:", dict);
+
     try {
-      const response = await fetch("http://localhost:8000/handle_new_data", {
+      const response = await fetch("http://localhost:8000/verify", {
         method: "POST", // or PUT
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ ingredients: rows }),
+        body: JSON.stringify(dict),
       });
 
       if (!response.ok) throw new Error(`HTTP ${response.status}`);

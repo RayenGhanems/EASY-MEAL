@@ -10,6 +10,14 @@ class Ingredient(SQLModel, table=True):
 class StoredIngredients(SQLModel, table=True):
     __tablename__ = "ingredients_stored"
 
-    user_id: int = Field(foreign_key="user.user_id")
+    id: int = Field(primary_key=True)
+    user_id: int = Field(foreign_key="users.user_id")
     ingredient_id: int = Field(foreign_key="ingredients.ingredient_id")
     amount: float
+
+class User(SQLModel, table=True):
+    __tablename__ = "users"
+
+    user_id: int = Field(primary_key=True)
+    username: str = Field(nullable=False, unique=True, index=True)
+    password: str = Field(nullable=False)

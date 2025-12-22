@@ -19,11 +19,11 @@ async def signup_user(user: dict):
     if not username or not password:
         return {"success": False, "message": "Email and password are required"}
 
-    existing_user = get_user_by_email(username, next(get_session()))
+    existing_user = get_user_by_email( next(get_session()), username)
     if existing_user:
         return {"success": False, "message": "User already exists"}
 
-    create_user(username, hash_password(password), next(get_session()))
+    create_user( next(get_session()),username, hash_password(password))
     return {"success": True, "message": "User created successfully"}
 
 @router.post("/signin")
@@ -31,7 +31,7 @@ async def signin_user(user: dict, response: Response):
     username = user.get("username")
     password = user.get("password")
 
-    existing_user = get_user_by_email(username, next(get_session()))
+    existing_user = get_user_by_email(next(get_session()), username)
     if not existing_user or not verify_password(password, existing_user.password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 

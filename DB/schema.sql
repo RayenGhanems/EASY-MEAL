@@ -138,9 +138,10 @@ CREATE TABLE recipe_tags (
 
 -- Table to store the ingredients of each user
 CREATE TABLE ingredients_stored (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_id INT,
     ingredient_id INT,
     amount NUMERIC NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES user(user_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (ingredient_id) REFERENCES ingredients(ingredient_id)
 );

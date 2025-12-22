@@ -26,3 +26,14 @@ def set_user_ingredient(session: Session, user_id: int, ingredient_id: int, amou
         new_row = StoredIngredients(user_id=user_id,ingredient_id=ingredient_id,amount=amount)
         session.add(new_row)
     session.commit()
+
+def get_user_by_email(session: Session, user_email: str):
+    statement = select(User).where(User.username == user_email)
+    return session.exec(statement).first()
+
+def create_user(session: Session, user_email: str, hashed_password: str):
+    new_user = User(username=user_email, password=hashed_password)
+    session.add(new_user)
+    session.commit()
+    session.refresh(new_user)
+    return new_user
