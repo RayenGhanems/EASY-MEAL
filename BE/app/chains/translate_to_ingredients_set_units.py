@@ -12,7 +12,7 @@ load_dotenv()
 # Load ingredient data
 # =========================================================
 
-INGREDIENTS_CSV = "../DB/Recepies/ingredients.csv"
+INGREDIENTS_CSV = "../../../DB/Recepies/ingredients.csv"  # t2akad mn he l location
 df_ing = pd.read_csv(INGREDIENTS_CSV)
 
 ingredient_list: List[str] = df_ing["ingredient_name"].tolist()
