@@ -239,7 +239,7 @@ export default function Upload() {
                   </tr>
                 ) : (
                   rows.map((r, i) => (
-                    <tr key={`${r.ingredient}-${i}`}>
+                    <tr key={i}>
                       <td style={styles.td}>
                         <input
                           style={styles.input}
