@@ -6,8 +6,7 @@ from app.core.security import get_current_user
 router = APIRouter(tags=["meals"])
 
 @router.post("/easy_meals")
-async def analyze_fridge(images: list[UploadFile] = File(...),
-    user_id: int = Depends(get_current_user)):
+async def analyze_fridge(images: list[UploadFile] = File(...), user_id: int = Depends(get_current_user)):
     imgs = []
     for image in images:
         image_bytes = await image.read()

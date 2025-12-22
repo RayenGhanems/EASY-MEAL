@@ -28,7 +28,6 @@ async def verify(items: list[IngredientInput], user_id: int = Depends(get_curren
             ingredient_id=row["ingredient_id"],
             amount=row["amount"]
         )
- 
     return {
         "status": "success",
         "added": cleaned

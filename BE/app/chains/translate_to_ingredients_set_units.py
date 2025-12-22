@@ -7,6 +7,7 @@ from sqlmodel import Session
 from langchain_openai import ChatOpenAI
  
 from dotenv import load_dotenv;load_dotenv()
+<<<<<<< Updated upstream
  
 from app.sql.sql_fxns import get_ingredient_table 
  
@@ -21,6 +22,25 @@ class IngredientInput(BaseModel):
 # =========================================================
  
 def load_ingredients_from_db(session : Session):
+=======
+
+from app.sql.sql_fxns import get_ingredient_table
+from app.DB import session
+
+
+from pydantic import BaseModel
+
+class IngredientInput(BaseModel):
+    ingredient: str
+    quantity: str
+    unit: str
+
+# =========================================================
+# Load ingredient data
+# =========================================================
+
+def load_ingredients_from_db(session: session):
+>>>>>>> Stashed changes
     ingredients = get_ingredient_table(session)
  
      # 1. List of ingredient names (for LLM resolution)
@@ -202,17 +222,30 @@ def estimate_conversion_llm(
  
     prompt = f"""
             You are a cooking assistant.
+<<<<<<< Updated upstream
  
             Estimate the conversion:
  
             Ingredient: {ingredient_name}
             Convert: {amount} {from_unit} → {to_unit}
  
+=======
+
+            Estimate the conversion:
+
+            Ingredient: {ingredient_name}
+            Convert: {amount} {from_unit} → {to_unit}
+
+>>>>>>> Stashed changes
             Return ONLY a number.
             No text. No explanation.
             Round to 2 decimals.
             """
+<<<<<<< Updated upstream
  
+=======
+
+>>>>>>> Stashed changes
     response = llm.invoke(prompt).content.strip()
  
     try:
@@ -288,24 +321,41 @@ def verifying_ingredients_chain(session: Session,user_input: Dict[str, str]) -> 
         })
     
     return rows
+<<<<<<< Updated upstream
  
  
+=======
+
+
+>>>>>>> Stashed changes
 def clean_for_sqlmodel(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
     Prepare chain output for IngredientStored SQLModel.
     """
     cleaned = []
+<<<<<<< Updated upstream
  
+=======
+
+>>>>>>> Stashed changes
     for row in rows:
         cleaned.append({
             "ingredient_id": row["ingredient_id"],
             "amount": row["amount"]
         })
+<<<<<<< Updated upstream
  
     return cleaned
  
  
  
+=======
+
+    return cleaned
+
+
+
+>>>>>>> Stashed changes
 # =========================================================
 # CLI test
 # =========================================================

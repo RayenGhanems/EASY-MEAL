@@ -37,3 +37,16 @@ def create_user(session: Session, user_email: str, hashed_password: str):
     session.commit()
     session.refresh(new_user)
     return new_user
+
+def get_user_ingredients(session: Session, user_id: int):
+    stmt = select(StoredIngredients).where(StoredIngredients.user_id == user_id)
+    return session.exec(stmt).all()
+
+def get_recipe_ingredients(session: Session, recipe_id: int):
+    stmt = select(RecipeIngredient).where(RecipeIngredient.recipe_id == recipe_id)
+    return session.exec(stmt).all()
+
+def get_all_recipes(session: Session):
+    return session.exec(select(Recipe)).all()
+
+

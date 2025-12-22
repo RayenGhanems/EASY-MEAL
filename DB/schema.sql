@@ -142,6 +142,7 @@ CREATE TABLE ingredients_stored (
     user_id INT,
     ingredient_id INT,
     amount NUMERIC NOT NULL,
+    PRIMARY KEY (user_id, ingredient_id),
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (ingredient_id) REFERENCES ingredients(ingredient_id)
 );
