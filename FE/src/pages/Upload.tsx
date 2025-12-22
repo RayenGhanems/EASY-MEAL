@@ -60,6 +60,7 @@ export default function Upload() {
       // Adjust this based on your real backend structure.
       const backendList =
         data?.ingredients ?? data?.data?.ingredients ?? data ?? [];
+      console.log("Backend list:", backendList);
 
       const normalized: IngredientRow[] = (
         Array.isArray(backendList) ? backendList : []
