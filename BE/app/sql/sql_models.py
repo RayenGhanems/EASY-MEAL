@@ -3,9 +3,9 @@ from sqlmodel import SQLModel, Field
 class Ingredient(SQLModel, table=True):
     __tablename__ = "ingredients"
 
-    ingredient: str = Field(primary_key=True, max_length=225)
-    quantity: int
-    threshold: int
+    ingredient_id: int = Field(primary_key=True)
+    ingredient_name: str = Field(nullable=False, index=True)
+    measuring_unit: str = Field(nullable=False)
 
 class User(SQLModel, table=True):
     __tablename__ = "users"
