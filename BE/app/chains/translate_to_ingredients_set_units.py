@@ -21,7 +21,7 @@ unit_map = dict(zip(df_ing["ingredient_id"], df_ing["measuring_unit"]))
 
 
 # =========================================================
-# Unit normalization (CRITICAL)
+# Unit normalization
 # =========================================================
 
 UNIT_NORMALIZATION = {
@@ -68,7 +68,7 @@ def parse_quantity(text: str) -> Tuple[float | None, str | None]:
 
 
 # =========================================================
-# Deterministic unit conversion (FAST PATH)
+# Deterministic unit conversion
 # =========================================================
 
 EASY_CONVERSION = {
@@ -92,8 +92,42 @@ def convert_amount(val: float, frm: str, to: str) -> float | None:
 # LLM setup
 # =========================================================
 
-llm = ChatOpenAI(model="gpt-4", temperature=0)
+llm = ChatOpenAI(model="gpt-3.5-turbo-16k", temperature=0)
 
+
+# =========================================================
+# LLM classification: INGREDIENT vs DISH
+# =========================================================
+
+def classify_food_llm(text: str) -> str:
+    """
+    Classify input as INGREDIENT or DISH.
+    """
+
+    prompt = f"""
+Classify the following as either:
+
+INGREDIENT → raw food item (sugar, garlic, milk, chocolate)
+DISH       → prepared food or recipe (cake, pizza, lasagna, cookies)
+
+Text:
+"{text}"
+
+Return ONLY one word:
+INGREDIENT or DISH
+"""
+
+    response = llm.invoke(prompt).content.strip().upper()
+
+    if response not in {"INGREDIENT", "DISH"}:
+        return "INGREDIENT"  # safe fallback
+
+    return response
+
+
+# =========================================================
+# LLM ingredient resolution
+# =========================================================
 
 def resolve_ingredient_llm(raw_name: str) -> dict:
     """
@@ -128,6 +162,10 @@ Rules:
     return json.loads(response)
 
 
+# =========================================================
+# LLM conversion estimation
+# =========================================================
+
 def estimate_conversion_llm(
     ingredient_name: str,
     amount: float,
@@ -135,72 +173,53 @@ def estimate_conversion_llm(
     to_unit: str
 ) -> float:
     """
-    LLM-based ESTIMATION.
+    LLM-based estimation.
     ALWAYS returns a number.
     """
 
     prompt = f"""
-        You are a cooking assistant.
+You are a cooking assistant.
 
-        Estimate the conversion:
+Estimate the conversion:
 
-        Ingredient: {ingredient_name}
-        Convert: {amount} {from_unit} → {to_unit}
+Ingredient: {ingredient_name}
+Convert: {amount} {from_unit} → {to_unit}
 
-        Return ONLY a number.
-        No text. No explanation.
-        Round to 2 decimals.
-        """
+Return ONLY a number.
+No text. No explanation.
+Round to 2 decimals.
+"""
 
     response = llm.invoke(prompt).content.strip()
 
     try:
         return float(response)
     except ValueError:
-        # Absolute safety fallback
-        return amount
+        return amount  # ultimate fallback
 
 
 # =========================================================
-# Translate json output to more sql frendly one
+# Main pipeline (returns SQL-ready rows)
 # =========================================================
 
-def to_sql_rows(agent_output: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """
-    Transform run_agent output into SQL-ready rows.
-    """
-
+def verifying_ingredients_chain(user_input: Dict[str, str]) -> List[Dict[str, Any]]:
     rows = []
 
-    for raw_name, data in agent_output.items():
-        if data.get("status") != "RESOLVED":
-            continue  # skip unresolved items
-
-        rows.append({
-            "ingredient_id": data["ingredient_id"],
-            "amount": data["canonical"]["amount"],
-            "unit": data["canonical"]["unit"]
-        })
-
-    return rows
-
-# =========================================================
-# Main pipeline
-# =========================================================
-
-def run_agent(user_input: Dict[str, str]) -> Dict[str, Any]:
-    results = {}
-
     for raw_name, raw_qty in user_input.items():
+
+        # -------------------------------------------------
+        # 0. Ingredient vs Dish classification
+        # -------------------------------------------------
+
+        if classify_food_llm(raw_name) == "DISH":
+            continue  # skip dishes entirely
 
         # -------------------------------------------------
         # 1. Resolve ingredient
         # -------------------------------------------------
 
         resolved = resolve_ingredient_llm(raw_name)
-
         if resolved["status"] != "RESOLVED":
-            results[raw_name] = resolved
             continue
 
         ingredient_name = resolved["ingredient_name"]
@@ -213,22 +232,19 @@ def run_agent(user_input: Dict[str, str]) -> Dict[str, Any]:
 
         qty_val, qty_unit = parse_quantity(raw_qty)
         if qty_val is None:
-            results[raw_name] = {"status": "PARSE_ERROR"}
             continue
 
         # -------------------------------------------------
-        # 3. Convert (deterministic → LLM estimate)
+        # 3. Convert amount
         # -------------------------------------------------
 
         if qty_unit == canonical_unit:
             final_amount = qty_val
-            method = "identity"
 
         else:
             converted = convert_amount(qty_val, qty_unit, canonical_unit)
             if converted is not None:
                 final_amount = converted
-                method = "internal_map"
             else:
                 final_amount = estimate_conversion_llm(
                     ingredient_name=ingredient_name,
@@ -236,30 +252,18 @@ def run_agent(user_input: Dict[str, str]) -> Dict[str, Any]:
                     from_unit=qty_unit,
                     to_unit=canonical_unit
                 )
-                method = "llm_estimate"
 
         # -------------------------------------------------
-        # 4. Final output (ALWAYS numeric)
+        # 4. SQL-ready row
         # -------------------------------------------------
 
-        results[raw_name] = {
-            "status": "RESOLVED",
+        rows.append({
             "ingredient_id": ingredient_id,
-            "ingredient_name": ingredient_name,
-            "input": {
-                "amount": qty_val,
-                "unit": qty_unit
-            },
-            "canonical": {
-                "amount": round(final_amount, 2),
-                "unit": canonical_unit
-            },
-            "conversion": {
-                "method": method
-            }
-        }
+            "amount": round(final_amount, 2),
+            "unit": canonical_unit
+        })
 
-    return to_sql_rows(results)
+    return rows
 
 
 # =========================================================
@@ -271,8 +275,9 @@ def run_agent(user_input: Dict[str, str]) -> Dict[str, Any]:
 #         "brown suggar": "2 cups",
 #         "olive oyl": "1 tbsp",
 #         "garlec": "3 cloves",
-#         "choclatr cake":"1 peace"
+#         "choclatr cake": "1 peace",
+#         "pizza": "2 slices"
 #     }
 
-#     out = run_agent(sample)
+#     out = verifying_ingredients_chain(sample)
 #     print(out)
