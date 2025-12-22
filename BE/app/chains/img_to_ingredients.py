@@ -56,4 +56,4 @@ llm = ChatOpenAI(
 
 # ---------- Runnable chain ----------
 
-chain = prompt | llm | parser
+img_to_ingredients_chain = prompt | llm | parser
