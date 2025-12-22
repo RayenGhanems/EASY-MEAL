@@ -2,7 +2,7 @@ from sqlmodel import Session, select
 
 from app.sql.sql_models import *
 
-def get_all_ingredients(session: Session):
+def get_ingredient_table(session: Session):
     statement = select(Ingredient)
     return session.exec(statement).all()
 

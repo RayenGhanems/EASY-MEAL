@@ -4,21 +4,35 @@ import json
 import pandas as pd
 
 from langchain_openai import ChatOpenAI
-from dotenv import load_dotenv
 
-load_dotenv()
+from dotenv import load_dotenv;load_dotenv()
+
+from app.sql.sql_fxns import get_ingredient_table
+from app.DB import Session
+
 
 # =========================================================
 # Load ingredient data
 # =========================================================
 
-INGREDIENTS_CSV = "app/data/ingredients.csv"  # t2akad mn he l location
-df_ing = pd.read_csv(INGREDIENTS_CSV)
+def load_ingredients_from_db(session: Session):
+    ingredients = get_ingredient_table(session)
 
-ingredient_list: List[str] = df_ing["ingredient_name"].tolist()
-ingredient_map = dict(zip(df_ing["ingredient_name"], df_ing["ingredient_id"]))
-unit_map = dict(zip(df_ing["ingredient_id"], df_ing["measuring_unit"]))
+    ingredient_list = [ing.ingredient for ing in ingredients]
 
+    # If ingredient name is the PK
+    ingredient_map = {
+        ing.ingredient: ing.ingredient  # or ing.id if you later add one
+        for ing in ingredients
+    }
+
+    # If you later add a unit column, map it here
+    unit_map = {
+        ing.ingredient: "gram"  # TEMP default until unit is in DB
+        for ing in ingredients
+    }
+
+    return ingredient_list, ingredient_map, unit_map
 
 # =========================================================
 # Unit normalization
@@ -129,34 +143,34 @@ INGREDIENT or DISH
 # LLM ingredient resolution
 # =========================================================
 
-def resolve_ingredient_llm(raw_name: str) -> dict:
+def resolve_ingredient_llm(raw_name: str, ingredient_list: List) -> dict:
     """
     Normalize noisy ingredient name
     """
 
     prompt = f"""
-You are an ingredient normalizer.
+                You are an ingredient normalizer.
 
-Raw ingredient:
-"{raw_name}"
+                Raw ingredient:
+                "{raw_name}"
 
-Allowed ingredient list:
-{json.dumps(ingredient_list)}
+                Allowed ingredient list:
+                {json.dumps(ingredient_list)}
 
-Return EXACTLY this JSON:
+                Return EXACTLY this JSON:
 
-{{
-  "status": "RESOLVED" | "AMBIGUOUS" | "UNKNOWN",
-  "ingredient_name": string | null,
-  "candidates": string[]
-}}
+                {{
+                "status": "RESOLVED" | "AMBIGUOUS" | "UNKNOWN",
+                "ingredient_name": string | null,
+                "candidates": string[]
+                }}
 
-Rules:
-- ingredient_name MUST be from the allowed list
-- Choose closest match even if imperfect
-- Prefer general ingredients
-- No explanations
-"""
+                Rules:
+                - ingredient_name MUST be from the allowed list
+                - Choose closest match even if imperfect
+                - Prefer general ingredients
+                - No explanations
+                """
 
     response = llm.invoke(prompt).content
     return json.loads(response)
@@ -204,6 +218,7 @@ Round to 2 decimals.
 
 def verifying_ingredients_chain(user_input: Dict[str, str]) -> List[Dict[str, Any]]:
     rows = []
+    ingredient_list, ingredient_map, unit_map = load_ingredients_from_db()
 
     for raw_name, raw_qty in user_input.items():
 
@@ -218,7 +233,7 @@ def verifying_ingredients_chain(user_input: Dict[str, str]) -> List[Dict[str, An
         # 1. Resolve ingredient
         # -------------------------------------------------
 
-        resolved = resolve_ingredient_llm(raw_name)
+        resolved = resolve_ingredient_llm(raw_name, ingredient_list)
         if resolved["status"] != "RESOLVED":
             continue
 
