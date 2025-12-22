@@ -1,0 +1,166 @@
+ingredient_id,ingredient_name,measuring_unit
+1,Agave Syrup,tablespoon
+2,Almonds,tablespoon
+3,Anchovy,teaspoon
+4,Apple Cider Vinegar,gram
+5,Apples,cup
+6,Artichoke,tablespoon
+7,Asparagus,gram
+8,Baking Powder,pinch
+9,Baking Soda,cup
+10,Balsamic Vinegar,tablespoon
+11,Bananas,teaspoon
+12,Barley,gram
+13,Basil,cup
+14,Bay Leaves,teaspoon
+15,Beef,cup
+16,Beetroot,tablespoon
+17,Bell Pepper,cup
+18,Black Beans,teaspoon
+19,Black Pepper,teaspoon
+20,Black Tea,cup
+21,Blackberry,cup
+22,Blue Cheese,leave
+23,Blueberries,ml
+24,Bread,large
+25,Broccoli,ml
+26,Buckwheat,pinch
+27,Butter,gram
+28,Buttermilk,cup
+29,Cabbage,gram
+30,Canola Oil,cup
+31,Cantaloupe,tablespoon
+32,Cardamom,teaspoon
+33,Carrots,cup
+34,Chamomile Tea,teaspoon
+35,Cheddar Cheese,cup
+36,Cheese,pinch
+37,Chicken,teaspoon
+38,Chickpeas,teaspoon
+39,Chili Powder,gram
+40,Chocolate,gram
+41,Cinnamon,gram
+42,Cloves,gram
+43,Cocoa Powder,tablespoon
+44,Coconut,gram
+45,Coconut Oil,cup
+46,Coffee Beans,gram
+47,Condensed Milk,teaspoon
+48,Coriander,gram
+49,Corn,tablespoon
+50,Couscous,tablespoon
+51,Crab,tablespoon
+52,Cream,gram
+53,Cucumber,teaspoon
+54,Cumin,gram
+55,Date,ml
+56,Duck,teaspoon
+57,Eggplant,piece
+58,Eggs,tablespoon
+59,Fig,cup
+60,Flax Seeds,tablespoon
+61,Flour,cup
+62,Garlic,cup
+63,Ginger,pinch
+64,Goose,gram
+65,Gouda Cheese,teaspoon
+66,Grapes,slice
+67,Green Peas,gram
+68,Green Tea,tablespoon
+69,Heavy Cream,tablespoon
+70,Honey,gram
+71,Honeydew,teaspoon
+72,Hot Sauce,cup
+73,Hummus,gram
+74,Ketchup,tablespoon
+75,Kidney Beans,tablespoon
+76,Kiwi,slice
+77,Lamb,gram
+78,Leeks,teaspoon
+79,Lemons,pinch
+80,Lentils,cup
+81,Lettuce,tablespoon
+82,Lobster,cup
+83,Mackerel,gram
+84,Mango,teaspoon
+85,Maple Syrup,tablespoon
+86,Mayonnaise,cup
+87,Milk,cup
+88,Molasses,teaspoon
+89,Mozzarella Cheese,gram
+90,Mushrooms,cup
+91,Mussels,cup
+92,Mustard,cup
+93,Nori,gram
+94,Nutmeg,gram
+95,Oats,cup
+96,Octopus,teaspoon
+97,Olive Oil,tablespoon
+98,Onion,piece
+99,Oranges,gram
+100,Oregano,teaspoon
+101,Papaya,leave
+102,Paprika,teaspoon
+103,Parmesan Cheese,ml
+104,Parsley,tablespoon
+105,Pasta,tablespoon
+106,Peaches,gram
+107,Peanuts,gram
+108,Pesto,tablespoon
+109,Pineapple,cup
+110,Polenta,gram
+111,Pomegranate,pinch
+112,Pork,tablespoon
+113,Potatoes,teaspoon
+114,Pumpkin,gram
+115,Pumpkin Seeds,teaspoon
+116,Quail,cup
+117,Quinoa,teaspoon
+118,Radish,large
+119,Raspberry,gram
+120,Red Wine,ml
+121,Red Wine Vinegar,teaspoon
+122,Rice,leave
+123,Rice Noodles,cup
+124,Rice Wine,large
+125,Rosemary,cup
+126,Rye,cup
+127,Saffron,teaspoon
+128,Salmon,piece
+129,Salt,teaspoon
+130,Sardines,tablespoon
+131,Scallops,large
+132,Seaweed,tablespoon
+133,Sesame Oil,gram
+134,Sesame Seeds,gram
+135,Shrimp,cup
+136,Soba Noodles,teaspoon
+137,Sour Cream,large
+138,Soybeans,piece
+139,Spinach,large
+140,Squid,gram
+141,Strawberries,cup
+142,Sugar,tablespoon
+143,Sunflower Seeds,tablespoon
+144,Sweet Potato,gram
+145,Tahini,pinch
+146,Tempeh,cup
+147,Thyme,gram
+148,Tofu,teaspoon
+149,Tomatoes,cup
+150,Truffle,piece
+151,Tuna,teaspoon
+152,Turkey,tablespoon
+153,Turmeric,tablespoon
+154,Turnip,ml
+155,Udon Noodles,piece
+156,Vanilla,teaspoon
+157,Vegetable Oil,teaspoon
+158,Venison,tablespoon
+159,Walnuts,cup
+160,Watermelon,tablespoon
+161,White Vinegar,piece
+162,White Wine,cup
+163,Yeast,slice
+164,Yogurt,tablespoon
+165,Zucchini,tablespoon

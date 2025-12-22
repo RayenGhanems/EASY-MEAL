@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Depends
 import base64
-from BE.app.chains.img_to_ingredients import img_to_ingredients_chain
+from app.chains.img_to_ingredients import img_to_ingredients_chain
 from app.core.security import get_current_user
 
 router = APIRouter(tags=["meals"])
