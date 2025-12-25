@@ -1,8 +1,10 @@
 from sqlmodel import Session
+from typing import List
+
 from app.sql.sql_fxns import get_all_recipes, get_user_ingredients, get_recipe_ingredients
 
 
-def get_cookable_recipes(session: Session, user_id: int):
+def get_cookable_recipes(session: Session, user_id: int) -> List[int]:
     """
     Return recipes the user can cook with current stored ingredients.
     """
@@ -25,14 +27,11 @@ def get_cookable_recipes(session: Session, user_id: int):
         for req in requirements:
             available = user_stock.get(req.ingredient_id, 0)
 
-            if available < req.amount:
+            if available <= req.amount:
                 can_cook = False
                 break
 
         if can_cook:
-            cookable.append({
-                "recipe_id": recipe.recipe_id,
-                "recipe_name": recipe.recipe_name
-            })
+            cookable.append(recipe.recipe_id)
 
     return cookable

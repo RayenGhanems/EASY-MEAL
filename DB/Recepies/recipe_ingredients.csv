@@ -2,6 +2,8 @@ recipe_id,ingredient_id,amount,quantity
 1,61,2.0,2 cups
 1,142,1.0,1 tablespoon
 1,129,1.0,1 teaspoon
+1,71,48.0,1 cup
+1,147,100.0,100g
 2,27,200.0,200 grams
 2,97,3.0,3 tablespoons
 2,62,0.5,1/2 cup
@@ -209,9 +211,3 @@ recipe_id,ingredient_id,amount,quantity
 70,2,6.0,3 slices
 70,107,0.5,1 pinch
 70,100,96.0,2 cups
-1,61,1.0,1 cup
-1,71,48.0,1 cup
-1,61,2.0,2 cups
-1,61,2.0,2 cups
-1,61,2.0,2 cups
-1,147,100.0,100g
