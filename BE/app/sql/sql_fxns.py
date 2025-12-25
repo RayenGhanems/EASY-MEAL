@@ -62,4 +62,7 @@ def store_cookable_recipes(session : Session, user_id:int, recipe_ids:List[int])
     session.add_all(rows)
     session.commit()
 
+def get_cookable_recipes(session: Session, user_id: int):
+    return session.exec(select(Cookable_recipes.recipe_id).where(Cookable_recipes.user_id == user_id)).all()
 
+     

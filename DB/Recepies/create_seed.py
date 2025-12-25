@@ -13,7 +13,7 @@ MAPPINGS = {
     "DB/Recepies/recipe_prep_times.csv": ("recipe_prep_times", ["recipe_id","prep_time","cook_time","total_time"]),
     "DB/Recepies/recipe_servings.csv": ("recipe_servings", ["recipe_id","servings","serving_size"]),
     "DB/Recepies/recipe_dietary_labels.csv": ("recipe_dietary_labels", ["recipe_id","dietary_label"]),
-    "recipe_videos.csv": ("recipe_videos", ["recipe_id","video_url"]),
+    "DB/Recepies/recipe_videos.csv": ("recipe_videos", ["recipe_id","video_url"]),
     "DB/Recepies/recipe_sources.csv": ("recipe_sources", ["recipe_id","source_name","source_url"]),
     "DB/Recepies/recipe_notes.csv": ("recipe_notes", ["recipe_id","note_text"]),
     "DB/Recepies/user_dietary_preferences.csv": ("user_dietary_preferences", ["user_id","dietary_preference"]),

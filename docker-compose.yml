@@ -24,6 +24,8 @@ services:
       - postgres               # ensure DB starts first
     ports:
       - "8000:8000"            # map container port to host
+    environment:
+      DATABASE_URL: postgresql://postgres:123@postgres:5432/DB
 
 
   frontend:

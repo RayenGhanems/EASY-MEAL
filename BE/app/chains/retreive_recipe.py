@@ -4,7 +4,7 @@ from app.sql.sql_models import *
 
 def get_full_recipe_by_id(session: Session, recipe_id: int) -> dict:
     # --------------------------------------------------
-    # 1. Base recipe + dish type
+    # 1. Recipe
     # --------------------------------------------------
     recipe = session.exec(
         select(Recipe).where(Recipe.recipe_id == recipe_id)
@@ -13,6 +13,9 @@ def get_full_recipe_by_id(session: Session, recipe_id: int) -> dict:
     if not recipe:
         raise ValueError("Recipe not found")
 
+    # --------------------------------------------------
+    # 2. Dish type
+    # --------------------------------------------------
     dish_type = None
     if recipe.dish_type_id:
         dish_type = session.exec(
@@ -21,7 +24,7 @@ def get_full_recipe_by_id(session: Session, recipe_id: int) -> dict:
         ).first()
 
     # --------------------------------------------------
-    # 2. Ingredients
+    # 3. Ingredients
     # --------------------------------------------------
     ingredients = session.exec(
         select(
@@ -31,24 +34,26 @@ def get_full_recipe_by_id(session: Session, recipe_id: int) -> dict:
             RecipeIngredient.amount,
             RecipeIngredient.quantity,
         )
-        .join(RecipeIngredient,
-              RecipeIngredient.ingredient_id == Ingredient.ingredient_id)
+        .join(
+            RecipeIngredient,
+            RecipeIngredient.ingredient_id == Ingredient.ingredient_id,
+        )
         .where(RecipeIngredient.recipe_id == recipe_id)
     ).all()
 
     ingredient_list = [
         {
-            "ingredient_id": i.ingredient_id,
-            "ingredient_name": i.ingredient_name,
-            "amount": i.amount,
-            "quantity": i.quantity,
-            "unit": i.measuring_unit,
+            "ingredient_id": row.ingredient_id,
+            "ingredient_name": row.ingredient_name,
+            "amount": row.amount,
+            "quantity": row.quantity,
+            "unit": row.measuring_unit,
         }
-        for i in ingredients
+        for row in ingredients
     ]
 
     # --------------------------------------------------
-    # 3. Instructions
+    # 4. Instructions
     # --------------------------------------------------
     instructions = session.exec(
         select(Instruction)
@@ -65,15 +70,15 @@ def get_full_recipe_by_id(session: Session, recipe_id: int) -> dict:
     ]
 
     # --------------------------------------------------
-    # 4. Videos
+    # 5. Videos
     # --------------------------------------------------
-    videos = session.exec(
+    video = session.exec(
         select(RecipeVideo.video_url)
         .where(RecipeVideo.recipe_id == recipe_id)
-    ).all()
+    ).first()
 
     # --------------------------------------------------
-    # 5. Ratings (with username)
+    # 6. Ratings
     # --------------------------------------------------
     ratings = session.exec(
         select(
@@ -93,7 +98,7 @@ def get_full_recipe_by_id(session: Session, recipe_id: int) -> dict:
     ]
 
     # --------------------------------------------------
-    # 6. Comments (with username + date)
+    # 7. Comments
     # --------------------------------------------------
     comments = session.exec(
         select(
@@ -116,7 +121,7 @@ def get_full_recipe_by_id(session: Session, recipe_id: int) -> dict:
     ]
 
     # --------------------------------------------------
-    # 7. Meta info (optional but powerful)
+    # 8. Meta
     # --------------------------------------------------
     prep_time = session.exec(
         select(RecipePrepTime)
@@ -139,7 +144,7 @@ def get_full_recipe_by_id(session: Session, recipe_id: int) -> dict:
     ).all()
 
     # --------------------------------------------------
-    # 8. Final response
+    # 9. Final response
     # --------------------------------------------------
     return {
         "recipe": {
@@ -150,13 +155,13 @@ def get_full_recipe_by_id(session: Session, recipe_id: int) -> dict:
         "dish_type": dish_type,
         "ingredients": ingredient_list,
         "instructions": instruction_list,
-        "videos": list(videos),
+        "videos": video,
         "ratings": rating_list,
         "comments": comment_list,
         "meta": {
             "prep_time": prep_time.dict() if prep_time else None,
             "servings": serving.dict() if serving else None,
-            "dietary_labels": list(labels),
-            "tags": list(tags),
+            "dietary_labels": [l for l in labels],
+            "tags": [t for t in tags],
         },
     }
