@@ -32,6 +32,27 @@ export default function Index() {
           </p>
         </div>
       </main>
+      {/* Main Card */}
+      <main style={styles.main}>
+        <div style={styles.card}>
+          <h2 style={styles.cardTitle}>Get available recipes</h2>
+          <p style={styles.cardText}>
+            let Easy Meal suggest recipes based on the ingredients detected in
+            your fridge.
+          </p>
+
+          <button
+            style={styles.primaryButton}
+            onClick={() => navigate("/recipes")}
+          >
+            🍳 Find recipes
+          </button>
+
+          <p style={styles.hint}>
+            More features coming soon (recipes, shopping lists, preferences…)
+          </p>
+        </div>
+      </main>
     </div>
   );
 }

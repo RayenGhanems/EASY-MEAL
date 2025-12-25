@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routes.auth import router as auth_router
 from app.routes.meals import router as meals_router
 from app.routes.verify import router as verify_router
+from app.routes.dish_types import router as dish_type_router
 
 app = FastAPI(title="EASY MEAL API")
 
@@ -17,6 +18,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(meals_router)
 app.include_router(verify_router)
+app.include_router(dish_type_router)
 
 if __name__ == "__main__":
     import uvicorn

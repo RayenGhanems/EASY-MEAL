@@ -5,6 +5,7 @@ import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import Index from "./pages/Index";
 import Home from "./pages/Home";
+import Recipes from "./pages/Recipes";
 import type { JSX } from "react";
 
 export default function App(): JSX.Element {
@@ -17,6 +18,7 @@ export default function App(): JSX.Element {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/recipes" element={<Recipes />} />
       </Routes>
     </BrowserRouter>
   );

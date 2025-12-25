@@ -7,6 +7,6 @@ from app.sql.sql_fxns import get_dish_types
 
 router = APIRouter(tags=["dish_type"])
 
-@router.post("/dish_type")
-async def get_dish_types(session: Session = Depends(get_session)):
+@router.get("/dish_type")
+async def get_dish_types_from_db(session: Session = Depends(get_session)):
     return get_dish_types(session)

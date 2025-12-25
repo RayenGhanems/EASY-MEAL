@@ -1,0 +1,42 @@
+Reset & base * {
+  margin: 0;
+}
+
+/* Background */
+
+#Main_div {
+  background-image: url("bg.jpeg");
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  padding: 10%;
+  text-align: center;
+  color: white;
+  font-family: "Arial", sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#welcomming {
+  font-size: 8em;
+  margin-bottom: 0.5em;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#welcomming_p {
+  font-size: 2em;
+  margin-bottom: 1em;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#index_button {
+  font-size: 2em;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+#index_button:hover {
+  background-color: rgba(0, 0, 0, 10);
+}
