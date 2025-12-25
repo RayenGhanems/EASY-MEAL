@@ -3,11 +3,8 @@ from jose import JWTError, jwt
 
 from app.DB import get_session
 from app.sql.sql_fxns import get_user_by_email, create_user
-from app.core.security import (
-    hash_password, verify_password,
-    create_access_token, create_refresh_token,
-    SECRET_KEY, ALGORITHM, ACCESS_EXPIRE_MIN, REFRESH_EXPIRE_DAYS
-)
+from app.core.security import hash_password, verify_password, create_access_token, create_refresh_token, SECRET_KEY, ALGORITHM, ACCESS_EXPIRE_MIN, REFRESH_EXPIRE_DAYS
+
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

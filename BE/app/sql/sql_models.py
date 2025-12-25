@@ -46,7 +46,7 @@ class StoredIngredients(SQLModel, table=True):
 # =========================================================
 
 class Cookable_recipes(SQLModel, table=True):
-    __tablename__ = "Cookable_recipes"
+    __tablename__ = "cookable_recipes"
 
     user_id: int = Field(foreign_key="users.user_id", primary_key=True)
     recipe_id: int = Field(foreign_key="recipes.recipe_id", primary_key=True)

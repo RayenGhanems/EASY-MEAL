@@ -49,6 +49,9 @@ def get_recipe_ingredients(session: Session, recipe_id: int):
 def get_all_recipes(session: Session):
     return session.exec(select(Recipe).where(Recipe.recipe_id <= 70)).all()
 
+def get_dish_types(session: Session):
+    return session.exec(select(DishType)).all()
+
 def delete_from_cookable_recipes(session: Session, user_id:int):
     session.exec(delete(Cookable_recipes).where(Cookable_recipes.user_id == user_id))
     session.commit()

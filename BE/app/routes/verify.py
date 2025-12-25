@@ -30,7 +30,7 @@ async def verify(items: list[IngredientInput], user_id: int = Depends(get_curren
             amount=row["amount"]
         )
     out = get_cookable_recipes(session, user_id)
-    store_cookable_recipes(session=session, user_id=user_id, recepie_id=out)
+    store_cookable_recipes(session=session, user_id=user_id, recipe_ids=out)
     
 
     return cleaned, out
