@@ -80,6 +80,7 @@ class RecipeIngredient(SQLModel, table=True):
     recipe_id: int = Field(foreign_key="recipes.recipe_id", primary_key=True)
     ingredient_id: int = Field(foreign_key="ingredients.ingredient_id", primary_key=True)
     amount: float
+    quantity: str
 
 class Instruction(SQLModel, table=True):
     __tablename__ = "instructions"
