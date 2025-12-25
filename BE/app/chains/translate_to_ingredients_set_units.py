@@ -177,7 +177,8 @@ def resolve_ingredient_llm(raw_name: str, ingredient_list: List) -> dict:
                 Rules:
                 - ingredient_name MUST be from the allowed list
                 - Choose closest match even if imperfect
-                - Prefer general ingredients
+                - Prefer exact or longer ingredient names when possible
+                - Do NOT collapse compound ingredients into simpler ones
                 - No explanations
                 """
  

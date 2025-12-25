@@ -145,3 +145,12 @@ CREATE TABLE ingredients_stored (
     FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (ingredient_id) REFERENCES ingredients(ingredient_id)
 );
+
+-- Table to store the cookable recepies of each user
+CREATE TABLE Cookable_recipes (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id INT,
+    recipe_id INT,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id)
+);

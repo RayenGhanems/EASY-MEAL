@@ -122,6 +122,8 @@ export default function Upload() {
         body: JSON.stringify(dict),
       });
 
+      const returned_data = await response.json();
+      console.log("returned_data :", returned_data);      
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       alert("Saved!");
@@ -129,6 +131,7 @@ export default function Upload() {
       console.error(e);
       alert("Save failed");
     }
+    
   };
 
   // --- JSX (your "HTML") that uses the styles object ---

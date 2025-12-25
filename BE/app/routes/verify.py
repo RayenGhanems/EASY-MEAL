@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends
 from typing import Dict
 from app.chains.translate_to_ingredients_set_units import verifying_ingredients_chain, clean_for_sqlmodel, IngredientInput
-from app.sql.sql_fxns import add_user_ingredient
+from app.chains.cookable_recepies import get_cookable_recipes
+from app.sql.sql_fxns import add_user_ingredient, store_cookable_recipes
 from app.DB import get_session
 from sqlmodel import Session
 from app.core.security import get_current_user
@@ -28,7 +29,8 @@ async def verify(items: list[IngredientInput], user_id: int = Depends(get_curren
             ingredient_id=row["ingredient_id"],
             amount=row["amount"]
         )
-    return {
-        "status": "success",
-        "added": cleaned
-    }
+    out = get_cookable_recipes(session, user_id)
+    store_cookable_recipes(session=session, user_id=user_id, recepie_id=out)
+    
+
+    return cleaned, out

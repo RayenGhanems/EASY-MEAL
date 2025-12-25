@@ -1,4 +1,5 @@
-from sqlmodel import Session, select
+from sqlmodel import Session, select, delete
+from  typing import List, Tuple
 
 from app.sql.sql_models import *
 
@@ -35,8 +36,7 @@ def create_user(session: Session, user_email: str, hashed_password: str):
     new_user = User(username=user_email, password=hashed_password)
     session.add(new_user)
     session.commit()
-    session.refresh(new_user)
-    return new_user
+
 
 def get_user_ingredients(session: Session, user_id: int):
     stmt = select(StoredIngredients).where(StoredIngredients.user_id == user_id)
@@ -47,6 +47,16 @@ def get_recipe_ingredients(session: Session, recipe_id: int):
     return session.exec(stmt).all()
 
 def get_all_recipes(session: Session):
-    return session.exec(select(Recipe)).all()
+    return session.exec(select(Recipe).where(Recipe.recipe_id <= 70)).all()
+
+def delete_from_cookable_recipes(session: Session, user_id:int):
+    session.exec(delete(Cookable_recipes).where(Cookable_recipes.user_id == user_id))
+    session.commit()
+
+def store_cookable_recipes(session : Session, user_id:int, recipe_ids:List[int]):
+    delete_from_cookable_recipes(session, user_id)
+    rows = [Cookable_recipes(user_id=user_id, recipe_id=recipe_id) for recipe_id in recipe_ids]
+    session.add_all(rows)
+    session.commit()
 
 
