@@ -1,5 +1,6 @@
 import { useState, type FormEvent, type JSX } from "react";
 import { Link } from "react-router-dom";
+import "../style/signin.css";
 
 interface SignUpResponse {
   message?: string;
@@ -46,72 +47,35 @@ export default function SignUp(): JSX.Element {
   };
 
   return (
-    <div style={styles.container}>
-      <form onSubmit={handleSubmit} style={styles.form}>
+    <div className="signin_div">
+      <form onSubmit={handleSubmit} className="sign_in_form">
         <h2>Sign Up</h2>
-
         <input
           type="username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Username"
           required
-          style={styles.input}
+          className="signin_inputs"
         />
-
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           required
-          style={styles.input}
+          className="signin_inputs"
         />
-
-        <button type="submit" disabled={loading} style={styles.button}>
+        <button type="submit" disabled={loading} className="signin_button">
           {loading ? "Creating account..." : "Sign Up"}
         </button>
-
-        {error && <p style={styles.error}>{error}</p>}
-        {success && <p style={styles.success}>{success}</p>}
+        {error && <p>{error}</p>}
+        {success && <p>{success}</p>}
+        <div className="signup_link">
+          Already have an account?
+          <Link to="/signin"> Sign In</Link>
+        </div>
       </form>
-      Already have an account?
-      <Link to="/signin"> Sign In</Link>
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-  },
-  form: {
-    width: 300,
-    padding: 20,
-    border: "1px solid #ddd",
-    borderRadius: 6,
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-  },
-  input: {
-    padding: 10,
-    fontSize: 14,
-  },
-  button: {
-    padding: 10,
-    fontSize: 14,
-    cursor: "pointer",
-  },
-  error: {
-    color: "red",
-    fontSize: 13,
-  },
-  success: {
-    color: "green",
-    fontSize: 13,
-  },
-};

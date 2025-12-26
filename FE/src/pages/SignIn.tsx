@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type JSX } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import "../style/signin.css";
 
 interface LoginResponse {
   access_token?: string;
@@ -51,67 +52,37 @@ export default function SignIn(): JSX.Element {
   };
 
   return (
-    <div style={styles.container}>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <h2>Sign In</h2>
-
+    <div className="signin_div">
+      <form onSubmit={handleSubmit} className="sign_in_form">
+        <h2 className="signin_lable">Sign In</h2>
         <input
           type="email"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Email"
           required
-          style={styles.input}
+          className="signin_inputs"
         />
-
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           required
-          style={styles.input}
+          className="signin_inputs"
         />
+        <div className="div_button">
+          <button type="submit" disabled={loading} className="signin_button">
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
+        </div>
 
-        <button type="submit" disabled={loading} style={styles.button}>
-          {loading ? "Signing in..." : "Sign In"}
-        </button>
-
-        {error && <p style={styles.error}>{error}</p>}
+        {error && <p>{error}</p>}
+        <div className="signup_link">
+          Do not have an account?
+          <Link to="/signup"> Sign Up</Link>
+        </div>
       </form>
-      Create an account?
-      <Link to="/signup"> Sign Up</Link>
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-  },
-  form: {
-    width: 300,
-    padding: 20,
-    border: "1px solid #ddd",
-    borderRadius: 6,
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-  },
-  input: {
-    padding: 10,
-    fontSize: 14,
-  },
-  button: {
-    padding: 10,
-    fontSize: 14,
-    cursor: "pointer",
-  },
-  error: {
-    color: "red",
-    fontSize: 13,
-  },
-};
