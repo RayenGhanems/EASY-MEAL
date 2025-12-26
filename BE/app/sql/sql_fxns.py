@@ -7,6 +7,14 @@ def get_ingredient_table(session: Session):
     statement = select(Ingredient)
     return session.exec(statement).all()
 
+def reduce_user_ingredient(session: Session, user_id: int, ingredient_id: int, amount: float):
+    statement = select(StoredIngredients).where(StoredIngredients.user_id == user_id, StoredIngredients.ingredient_id == ingredient_id)
+    existing = session.exec(statement).first()
+    if not existing:
+        return
+    existing.amount -= amount
+    if existing.amount <= 0:
+        session.delete(existing)
 
 def add_user_ingredient(session: Session, user_id: int, ingredient_id: int, amount: float):
     statement = select(StoredIngredients).where( StoredIngredients.user_id == user_id, StoredIngredients.ingredient_id == ingredient_id)
@@ -62,7 +70,8 @@ def store_cookable_recipes(session : Session, user_id:int, recipe_ids:List[int])
     session.add_all(rows)
     session.commit()
 
-def get_cookable_recipes(session: Session, user_id: int):
+def get_cookable_recipes_sql(session: Session, user_id: int):
     return session.exec(select(Cookable_recipes.recipe_id).where(Cookable_recipes.user_id == user_id)).all()
 
-     
+def rmv_frm_cookable_sql(session: Session, user_id: int, recipe_id: int):
+    session.exec(delete(Cookable_recipes).where(Cookable_recipes.user_id == user_id, Cookable_recipes.recipe_id == recipe_id))

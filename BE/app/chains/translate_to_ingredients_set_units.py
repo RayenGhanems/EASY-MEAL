@@ -1,52 +1,61 @@
 from typing import Dict, Any, List, Tuple
 import re
 import json
-import pandas as pd
+
 from sqlmodel import Session
- 
 from langchain_openai import ChatOpenAI
- 
-from dotenv import load_dotenv;load_dotenv()
- 
-from app.sql.sql_fxns import get_ingredient_table 
- 
+from dotenv import load_dotenv
 from pydantic import BaseModel
- 
+
+from app.sql.sql_fxns import get_ingredient_table
+
+load_dotenv()
+
+# =========================================================
+# --------------------- Data Models -----------------------
+# =========================================================
+
 class IngredientInput(BaseModel):
     ingredient: str
     quantity: str
- 
+
+
 # =========================================================
-# Load ingredient data
+# ------------------- DB Preparation ----------------------
 # =========================================================
- 
-def load_ingredients_from_db(session : Session):
+
+def load_ingredients_from_db(session: Session):
+    """
+    Load ingredients from DB and prepare:
+    - ingredient_list (sorted by length DESC for LLM resolution)
+    - ingredient_map (case-insensitive lookup)
+    - unit_map (DB presentation units)
+    """
     ingredients = get_ingredient_table(session)
- 
-     # 1. List of ingredient names (for LLM resolution)
-    ingredient_list = [
-        ing.ingredient_name
-        for ing in ingredients
-    ]
- 
-    # 2. Map ingredient name -> ingredient_id
+
+    ingredient_list = sorted(
+        [ing.ingredient_name for ing in ingredients],
+        key=len,
+        reverse=True
+    )
+
     ingredient_map = {
-        ing.ingredient_name: ing.ingredient_id
+        ing.ingredient_name.lower(): ing.ingredient_id
         for ing in ingredients
     }
- 
-    # 3. Map ingredient_id -> measuring_unit
+
     unit_map = {
-        ing.ingredient_id: ing.measuring_unit
+        ing.ingredient_id: ing.measuring_unit.lower()
         for ing in ingredients
     }
- 
+
     return ingredient_list, ingredient_map, unit_map
- 
+
+
 # =========================================================
-# Unit normalization
+# ------------------- Unit Handling -----------------------
 # =========================================================
- 
+
 UNIT_NORMALIZATION = {
     # volume
     "cups": "cup",
@@ -59,266 +68,275 @@ UNIT_NORMALIZATION = {
     "tsp": "teaspoon",
     "ml": "ml",
     "l": "l",
- 
+
     # mass
+    "kilograms": "kg",
+    "kilogram": "kg",
+    "kg": "kg",
     "grams": "gram",
     "gram": "gram",
     "g": "gram",
- 
+
     # discrete
     "cloves": "clove",
-    "clove": "clove"
+    "clove": "clove",
+    "pcs": "pcs",
+    "piece": "pcs",
+    "pieces": "pcs",
 }
- 
-def normalize_unit(unit: str) -> str:
+
+def normalize_unit(unit: str | None) -> str | None:
+    if not unit:
+        return None
     return UNIT_NORMALIZATION.get(unit.lower(), unit.lower())
- 
- 
+
+
 # =========================================================
-# Quantity parsing
+# ---------------- Quantity Parsing -----------------------
 # =========================================================
- 
+
 def parse_quantity(text: str) -> Tuple[float | None, str | None]:
     """
-    Extract numeric value and unit from strings like:
-    '2 cups', '1 tbsp', '3 cloves'
+    Parses:
+    - '5 kg'
+    - '05 Kg'
+    - '2cups'
+    - '1 tbsp'
     """
     pattern = re.compile(r"(\d+(?:\.\d+)?)\s*([a-zA-Z]+)")
-    m = pattern.search(text.lower())
-    if not m:
+    match = pattern.search(text.lower())
+
+    if not match:
         return None, None
-    return float(m.group(1)), normalize_unit(m.group(2))
- 
- 
+
+    value = float(match.group(1))
+    unit = normalize_unit(match.group(2))
+    return value, unit
+
+
 # =========================================================
-# Deterministic unit conversion
+# ---------------- Deterministic Conversion ---------------
 # =========================================================
- 
+
 EASY_CONVERSION = {
+    ("kg", "gram"): 1000,
+    ("gram", "kg"): 0.001,
+
     ("cup", "tablespoon"): 16,
     ("tablespoon", "teaspoon"): 3,
- 
+
     ("teaspoon", "gram"): 5,
     ("tablespoon", "gram"): 15,
     ("cup", "gram"): 240,
     ("ml", "gram"): 1,
 }
- 
-def convert_amount(val: float, frm: str, to: str) -> float | None:
-    factor = EASY_CONVERSION.get((frm, to))
+
+def convert_amount(value: float, from_unit: str, to_unit: str) -> float | None:
+    factor = EASY_CONVERSION.get((from_unit, to_unit))
     if factor is None:
         return None
-    return val * factor
- 
- 
+    return value * factor
+
+
 # =========================================================
-# LLM setup
+# -------------------- LLM Setup --------------------------
 # =========================================================
- 
+
 llm = ChatOpenAI(model="gpt-3.5-turbo-16k", temperature=0)
- 
- 
+
+
 # =========================================================
-# LLM classification: INGREDIENT vs DISH
+# ------------ INGREDIENT vs DISH Filter -----------------
 # =========================================================
- 
+
 def classify_food_llm(text: str) -> str:
-    """
-    Classify input as INGREDIENT or DISH.
-    """
- 
     prompt = f"""
 Classify the following as either:
- 
-INGREDIENT → raw food item (sugar, garlic, milk, chocolate)
-DISH       → prepared food or recipe (cake, pizza, lasagna, cookies)
- 
+
+INGREDIENT → raw food item
+DISH       → prepared meal or recipe
+
 Text:
 "{text}"
- 
-Return ONLY one word:
-INGREDIENT or DISH
+
+Return ONLY one word.
 """
- 
-    response = llm.invoke(prompt).content.strip().upper()
- 
-    if response not in {"INGREDIENT", "DISH"}:
-        return "INGREDIENT"  # safe fallback
- 
-    return response
- 
- 
+    try:
+        out = llm.invoke(prompt).content.strip().upper()
+        return out if out in {"INGREDIENT", "DISH"} else "INGREDIENT"
+    except Exception:
+        return "INGREDIENT"
+
+
 # =========================================================
-# LLM ingredient resolution
+# ------------ Ingredient Name Resolution ----------------
 # =========================================================
- 
-def resolve_ingredient_llm(raw_name: str, ingredient_list: List) -> dict:
+
+def resolve_ingredient_llm(raw_name: str, ingredient_list: List[str]) -> dict:
     """
-    Normalize noisy ingredient name
+    Resolve noisy ingredient names to exact DB ingredient names.
+
+    Critical rules:
+    - Output MUST be from allowed list
+    - If one name contains another, ALWAYS choose the LONGER one
+      (e.g. honeydew → Honeydew, NOT Honey)
     """
- 
     prompt = f"""
-                You are an ingredient normalizer.
- 
-                Raw ingredient:
-                "{raw_name}"
- 
-                Allowed ingredient list:
-                {json.dumps(ingredient_list)}
- 
-                Return EXACTLY this JSON:
- 
-                {{
-                "status": "RESOLVED" | "AMBIGUOUS" | "UNKNOWN",
-                "ingredient_name": string | null,
-                "candidates": string[]
-                }}
- 
-                Rules:
-                - ingredient_name MUST be from the allowed list
-                - Choose closest match even if imperfect
-                - Prefer exact or longer ingredient names when possible
-                - Do NOT collapse compound ingredients into simpler ones
-                - No explanations
-                """
- 
-    response = llm.invoke(prompt).content
-    return json.loads(response)
- 
- 
+You are an ingredient normalizer.
+
+Raw ingredient:
+"{raw_name}"
+
+Allowed ingredient list (sorted by specificity):
+{json.dumps(ingredient_list)}
+
+Return EXACTLY this JSON:
+{{
+  "status": "RESOLVED" | "AMBIGUOUS" | "UNKNOWN",
+  "ingredient_name": string | null,
+  "candidates": string[]
+}}
+
+Rules:
+- ingredient_name MUST be from the allowed list
+- If one ingredient name is a substring of another,
+  ALWAYS choose the LONGER name
+- Prefer exact matches over semantic ones
+- Do NOT collapse ingredients into more generic ones
+- No explanations
+"""
+    try:
+        return json.loads(llm.invoke(prompt).content)
+    except Exception:
+        return {"status": "UNKNOWN", "ingredient_name": None, "candidates": []}
+
+
 # =========================================================
-# LLM conversion estimation
+# --------- LLM Conversion (GUARDED GUESSING) -------------
 # =========================================================
- 
-def estimate_conversion_llm(
+
+def llm_convert_with_guardrails(
     ingredient_name: str,
     amount: float,
     from_unit: str,
     to_unit: str
 ) -> float:
     """
-    LLM-based estimation.
-    ALWAYS returns a number.
+    LLM-based conversion with HARD safety bounds.
+    Used only when deterministic conversion fails.
     """
- 
     prompt = f"""
-            You are a cooking assistant.
- 
-            Estimate the conversion:
- 
-            Ingredient: {ingredient_name}
-            Convert: {amount} {from_unit} → {to_unit}
- 
-            Return ONLY a number.
-            No text. No explanation.
-            Round to 2 decimals.
-            """
- 
-    response = llm.invoke(prompt).content.strip()
- 
+You are estimating ingredient quantities for a cooking inventory app.
+
+IMPORTANT:
+- Conversion may be physically ambiguous
+- Make a reasonable culinary assumption
+- Approximation is acceptable
+
+Ingredient: {ingredient_name}
+Convert: {amount} {from_unit} → {to_unit}
+
+Rules:
+- Return ONLY a number
+- Round to 2 decimals
+"""
     try:
-        return float(response)
-    except ValueError:
-        return amount  # ultimate fallback
- 
- 
+        estimated = float(llm.invoke(prompt).content.strip())
+    except Exception:
+        return amount
+
+    # -------- Guardrails --------
+    if estimated <= 0:
+        return amount
+
+    if estimated > amount * 10_000:
+        return amount * 1000
+
+    if estimated < amount * 0.0001:
+        return amount * 0.01
+
+    print(
+        f"[LLM-GUESS] {ingredient_name}: "
+        f"{amount} {from_unit} → {estimated} {to_unit}"
+    )
+
+    return estimated
+
+
 # =========================================================
-# Main pipeline (returns SQL-ready rows)
+# ------------------ MAIN PIPELINE ------------------------
 # =========================================================
- 
-def verifying_ingredients_chain(session: Session,user_input: Dict[str, str]) -> List[Dict[str, Any]]:
+
+def verifying_ingredients_chain(
+    session: Session,
+    user_input: Dict[str, str]
+) -> List[Dict[str, Any]]:
+
     rows = []
     ingredient_list, ingredient_map, unit_map = load_ingredients_from_db(session)
- 
+
     for raw_name, raw_qty in user_input.items():
- 
-        # -------------------------------------------------
-        # 0. Ingredient vs Dish classification
-        # -------------------------------------------------
- 
+
+        # 0. Dish filter
         if classify_food_llm(raw_name) == "DISH":
-            continue  # skip dishes entirely
- 
-        # -------------------------------------------------
-        # 1. Resolve ingredient
-        # -------------------------------------------------
- 
+            continue
+
+        # 1. Resolve ingredient name
         resolved = resolve_ingredient_llm(raw_name, ingredient_list)
         if resolved["status"] != "RESOLVED":
             continue
- 
-        ingredient_name = resolved["ingredient_name"]
-        ingredient_id = ingredient_map[ingredient_name]
-        canonical_unit = normalize_unit(unit_map[ingredient_id])
- 
-        # -------------------------------------------------
-        # 2. Parse quantity
-        # -------------------------------------------------
- 
-        qty_val, qty_unit = parse_quantity(raw_qty)
-        if qty_val is None:
+
+        ingredient_name = resolved["ingredient_name"].lower().strip()
+        ingredient_id = ingredient_map.get(ingredient_name)
+
+        if ingredient_id is None:
+            print(f"[WARN] Ingredient not in DB: {ingredient_name}")
             continue
- 
-        # -------------------------------------------------
-        # 3. Convert amount
-        # -------------------------------------------------
- 
-        if qty_unit == canonical_unit:
-            final_amount = qty_val
- 
+
+        db_unit = normalize_unit(unit_map[ingredient_id])
+
+        # 2. Parse quantity
+        qty_value, qty_unit = parse_quantity(raw_qty)
+        if qty_value is None or qty_unit is None:
+            continue
+
+        # 3. Convert quantity
+        if qty_unit == db_unit:
+            final_amount = qty_value
         else:
-            converted = convert_amount(qty_val, qty_unit, canonical_unit)
+            converted = convert_amount(qty_value, qty_unit, db_unit)
             if converted is not None:
                 final_amount = converted
             else:
-                final_amount = estimate_conversion_llm(
-                    ingredient_name=ingredient_name,
-                    amount=qty_val,
-                    from_unit=qty_unit,
-                    to_unit=canonical_unit
+                final_amount = llm_convert_with_guardrails(
+                    ingredient_name,
+                    qty_value,
+                    qty_unit,
+                    db_unit
                 )
- 
-        # -------------------------------------------------
-        # 4. SQL-ready row
-        # -------------------------------------------------
- 
+
+        # 4. Store result (never silently drop)
         rows.append({
             "ingredient_id": ingredient_id,
             "amount": round(final_amount, 2),
-            "unit": canonical_unit
+            "unit": db_unit
         })
-    
+
     return rows
- 
- 
+
+
+# =========================================================
+# ---------------- SQLModel Cleaner -----------------------
+# =========================================================
+
 def clean_for_sqlmodel(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
-    Prepare chain output for IngredientStored SQLModel.
+    Prepare output for SQLModel insertion.
     """
-    cleaned = []
- 
-    for row in rows:
-        cleaned.append({
+    return [
+        {
             "ingredient_id": row["ingredient_id"],
             "amount": row["amount"]
-        })
- 
-    return cleaned
- 
- 
- 
-# =========================================================
-# CLI test
-# =========================================================
- 
-# if __name__ == "__main__":
-#     sample = {
-#         "brown suggar": "2 cups",
-#         "olive oyl": "1 tbsp",
-#         "garlec": "3 cloves",
-#         "choclatr cake": "1 peace",
-#         "pizza": "2 slices"
-#     }
- 
-#     out = verifying_ingredients_chain(sample)
-#     print(out)
+        }
+        for row in rows
+    ]

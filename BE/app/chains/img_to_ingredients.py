@@ -39,7 +39,13 @@ Task_Discription = "Analyze the fridge image and count each ingredient."
 prompt = ChatPromptTemplate.from_messages([
     ("system",  "You are a helpful assistant. "
                 "You will be given an image of a fridge, and you must name each ingredient you see and count how many of each ingredient appears. "
-                "You MUST follow the output format exactly as instructed."),
+                "You MUST follow the output format exactly as instructed."
+                "You MUST output units from: kg, g, ml, l, pcs."
+                "If the real-world unit is something else (cans, bottles, packs) translate them to:"
+                "- Liquids → l"
+                "- Solids → pcs"
+                "- Cans → kg"
+                "- Never output other unit strings"),
     ("human", [ {"type": "text", "text": "{task_description}"},
                 {"type": "image_url", "image_url": {"url": "data:image/png;base64,{image_base64}"}},
                 {"type": "text", "text": "{format_output_instructions}"}])
