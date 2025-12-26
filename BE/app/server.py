@@ -4,7 +4,7 @@ from app.routes.auth import router as auth_router
 from app.routes.meals import router as meals_router
 from app.routes.verify import router as verify_router
 from app.routes.dish_types import router as dish_type_router
-from app.routes.get_recipes import router as get_recipe_router
+from app.routes.get_recipes import router as get_recipes_router
 
 app = FastAPI(title="EASY MEAL API")
 
@@ -20,7 +20,7 @@ app.include_router(auth_router)
 app.include_router(meals_router)
 app.include_router(verify_router)
 app.include_router(dish_type_router)
-app.include_router(get_recipe_router)
+app.include_router(get_recipes_router)
 
 if __name__ == "__main__":
     import uvicorn

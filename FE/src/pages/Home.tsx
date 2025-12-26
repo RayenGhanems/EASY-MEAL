@@ -57,7 +57,7 @@ export default function Index() {
 const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: "100vh",
-    background: "linear-gradient(135deg, #f8fafc, #eef2f7)",
+    background: "linear-gradient(90deg, #b4357a, #f2b272, #dbf9fe, #174e7f)",
     display: "flex",
     flexDirection: "column",
   },
@@ -92,7 +92,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   card: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(0, 0, 0, 0.35)",
     borderRadius: 16,
     padding: 32,
     width: "100%",
@@ -104,12 +104,12 @@ const styles: Record<string, React.CSSProperties> = {
   cardTitle: {
     fontSize: "1.5rem",
     marginBottom: 12,
-    color: "#111827",
+    color: "#ffffffff",
   },
 
   cardText: {
     fontSize: "1rem",
-    color: "#4b5563",
+    color: "#ffffffff",
     marginBottom: 24,
   },
 
@@ -121,14 +121,14 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 10,
     border: "none",
     cursor: "pointer",
-    background: "linear-gradient(135deg, #10b981, #059669)",
     color: "#ffffff",
     transition: "transform 0.15s ease, box-shadow 0.15s ease",
+    backgroundColor: "rgba(0, 0, 0, 0.55)",
   },
 
   hint: {
     marginTop: 20,
     fontSize: "0.85rem",
-    color: "#9ca3af",
+    color: "black",
   },
 };

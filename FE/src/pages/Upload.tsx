@@ -123,7 +123,7 @@ export default function Upload() {
       });
 
       const returned_data = await response.json();
-      console.log("returned_data :", returned_data);      
+      console.log("returned_data :", returned_data);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       alert("Saved!");
@@ -131,7 +131,6 @@ export default function Upload() {
       console.error(e);
       alert("Save failed");
     }
-    
   };
 
   // --- JSX (your "HTML") that uses the styles object ---
@@ -169,7 +168,7 @@ export default function Upload() {
           {files.length > 0 && (
             <>
               <div
-                style={{ marginTop: 14, color: "#6b7280", fontSize: "0.9rem" }}
+                style={{ marginTop: 14, color: "#ffffff", fontSize: "0.9rem" }}
               >
                 Selected files:{" "}
                 <strong style={{ color: "#111827" }}>{files.length}</strong>
@@ -235,7 +234,7 @@ export default function Upload() {
                 {rows.length === 0 ? (
                   <tr>
                     <td style={styles.td} colSpan={4}>
-                      <span style={{ color: "#6b7280" }}>
+                      <span style={{ color: "#ffffff" }}>
                         No ingredients yet.
                       </span>
                     </td>
@@ -330,7 +329,7 @@ export default function Upload() {
 const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: "100vh",
-    background: "linear-gradient(135deg, #f8fafc, #eef2f7)",
+    background: "linear-gradient(90deg, #b4357a, #f2b272, #dbf9fe, #174e7f)",
     display: "flex",
     flexDirection: "column",
   },
@@ -362,7 +361,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   card: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(0, 0, 0, 0.35)",
     borderRadius: 16,
     padding: 28,
     width: "100%",
@@ -373,7 +372,7 @@ const styles: Record<string, React.CSSProperties> = {
   sectionTitle: {
     fontSize: "1.15rem",
     margin: "0 0 12px 0",
-    color: "#111827",
+    color: "#ffffff",
   },
 
   dropzone: {
@@ -384,7 +383,7 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
     background:
       "linear-gradient(135deg, rgba(16,185,129,0.06), rgba(59,130,246,0.06))",
-    color: "#111827",
+    color: "#ffffff",
     transition: "transform 0.15s ease, box-shadow 0.15s ease",
   },
 
@@ -396,7 +395,7 @@ const styles: Record<string, React.CSSProperties> = {
   helperText: {
     marginTop: 10,
     fontSize: "0.9rem",
-    color: "#6b7280",
+    color: "#ffffff",
   },
 
   fileList: {
@@ -418,7 +417,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   fileName: {
-    color: "#374151",
+    color: "#ffffff",
     fontSize: "0.95rem",
     overflow: "hidden",
     textOverflow: "ellipsis",
@@ -440,7 +439,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 10,
     border: "none",
     cursor: "pointer",
-    background: "linear-gradient(135deg, #10b981, #059669)",
+    backgroundColor: "rgba(0, 0, 0, 0.55)",
     color: "#ffffff",
     boxShadow: "0 10px 20px rgba(16,185,129,0.18)",
     transition: "transform 0.15s ease, box-shadow 0.15s ease",
@@ -453,8 +452,8 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 10,
     border: "1px solid #e5e7eb",
     cursor: "pointer",
-    background: "#ffffff",
-    color: "#111827",
+    backgroundColor: "rgba(0, 0, 0, 0.55)",
+    color: "#ffffff",
     transition: "transform 0.15s ease, box-shadow 0.15s ease",
   },
 
@@ -492,8 +491,7 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "left",
     padding: "12px 12px",
     fontSize: "0.85rem",
-    color: "#6b7280",
-    background: "#f9fafb",
+    color: "#ffffff",
     borderBottom: "1px solid #e5e7eb",
   },
 
