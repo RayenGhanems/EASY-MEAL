@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "../style/recipes.css";
 
 export default function Recipes() {
   type DishType = {
@@ -6,6 +7,7 @@ export default function Recipes() {
     dish_type_id: number;
   };
   const [dish_types, setDishTypes] = useState<DishType[]>([]);
+  const [dishInput, setDishInput] = useState("");
   const [SelectedDishType, setSelectedDishType] = useState<number | "">("");
 
   useEffect(() => {
@@ -26,23 +28,48 @@ export default function Recipes() {
     fetchDishTypes();
   }, []);
 
+  const handleGetRecipes = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/get_recipes", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      console.log("Fetched recipes:", data);
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+    }
+  };
   return (
-    <div>
+    <div className="recipe_page">
       <h1>Recipes Page</h1>
       <div>
-        Select a dish type:
-        <select
-          value={SelectedDishType}
+        <input
+          placeholder="choose a type"
+          list="dish_types"
+          value={dishInput}
           onChange={(e) => {
-            setSelectedDishType(Number(e.target.value));
+            const value = e.target.value;
+            setDishInput(value);
+            const selectedType = dish_types.find(
+              (type) => type.dish_type_name === value
+            );
+            setSelectedDishType(selectedType ? selectedType.dish_type_id : "");
+            console.log("Selected Dish Type ID:", SelectedDishType);
           }}
-        >
+        />
+        <datalist id="dish_types">
           {dish_types.map((type) => (
-            <option key={type.dish_type_id} value={type.dish_type_id}>
+            <option key={type.dish_type_id} value={type.dish_type_name}>
               {type.dish_type_name}
             </option>
           ))}
-        </select>
+        </datalist>
+        <button onClick={() => handleGetRecipes()}>get recipes</button>
       </div>
     </div>
   );

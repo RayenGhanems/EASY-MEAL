@@ -5,54 +5,52 @@ export default function Index() {
 
   return (
     <div style={styles.page}>
-      {/* Header */}
       <header style={styles.header}>
         <h1 style={styles.title}>🍽️ Easy Meal</h1>
         <p style={styles.subtitle}>Turn your fridge into smart meal ideas</p>
       </header>
+      <div style={styles.container}>
+        <div style={styles.main}>
+          <div style={styles.card}>
+            <h2 style={styles.cardTitle}>Scan your fridge</h2>
+            <p style={styles.cardText}>
+              Upload photos of your fridge or ingredients and let Easy Meal
+              analyze what you have.
+            </p>
 
-      {/* Main Card */}
-      <main style={styles.main}>
-        <div style={styles.card}>
-          <h2 style={styles.cardTitle}>Scan your fridge</h2>
-          <p style={styles.cardText}>
-            Upload photos of your fridge or ingredients and let Easy Meal
-            analyze what you have.
-          </p>
+            <button
+              style={styles.primaryButton}
+              onClick={() => navigate("/upload")}
+            >
+              📸 Upload fridge photos
+            </button>
 
-          <button
-            style={styles.primaryButton}
-            onClick={() => navigate("/upload")}
-          >
-            📸 Upload fridge photos
-          </button>
-
-          <p style={styles.hint}>
-            More features coming soon (recipes, shopping lists, preferences…)
-          </p>
+            <p style={styles.hint}>
+              More features coming soon (recipes, shopping lists, preferences…)
+            </p>
+          </div>
         </div>
-      </main>
-      {/* Main Card */}
-      <main style={styles.main}>
-        <div style={styles.card}>
-          <h2 style={styles.cardTitle}>Get available recipes</h2>
-          <p style={styles.cardText}>
-            let Easy Meal suggest recipes based on the ingredients detected in
-            your fridge.
-          </p>
+        <div style={styles.main}>
+          <div style={styles.card}>
+            <h2 style={styles.cardTitle}>Get available recipes</h2>
+            <p style={styles.cardText}>
+              let Easy Meal suggest recipes based on the ingredients detected in
+              your fridge.
+            </p>
 
-          <button
-            style={styles.primaryButton}
-            onClick={() => navigate("/recipes")}
-          >
-            🍳 Find recipes
-          </button>
+            <button
+              style={styles.primaryButton}
+              onClick={() => navigate("/recipes")}
+            >
+              🍳 Find recipes
+            </button>
 
-          <p style={styles.hint}>
-            More features coming soon (recipes, shopping lists, preferences…)
-          </p>
+            <p style={styles.hint}>
+              More features coming soon (recipes, shopping lists, preferences…)
+            </p>
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
@@ -62,6 +60,10 @@ const styles: Record<string, React.CSSProperties> = {
     background: "linear-gradient(135deg, #f8fafc, #eef2f7)",
     display: "flex",
     flexDirection: "column",
+  },
+  container: {
+    display: "flex",
+    flexDirection: "row",
   },
 
   header: {

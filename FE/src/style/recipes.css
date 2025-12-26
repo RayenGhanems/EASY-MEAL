@@ -1,0 +1,8 @@
+.recipe_page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f9f9f9;
+  color: black;
+  min-height: 100vh;
+}

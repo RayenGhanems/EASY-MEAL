@@ -1,0 +1,67 @@
+.signin_div {
+  background: linear-gradient(90deg, #b4357a, #f2b272, #dbf9fe, #174e7f);
+  background-size: cover;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sign_in_form {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: white;
+  font-family: "Arial", sans-serif;
+  width: 20%;
+  border-radius: 8px;
+  height: fit-content;
+  padding: 3%;
+}
+
+.signin_inputs {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.signin_button {
+  font-size: 1em;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px;
+}
+.signin_button:hover {
+  background-color: rgba(0, 0, 0, 10);
+}
+.div_button {
+  display: flex;
+  justify-content: center;
+}
+.signin_lable {
+  text-align: center;
+  font-size: 2em;
+}
+.signup_link {
+  margin-top: 15px;
+  text-align: center;
+  font-size: larger;
+  text-decoration: none;
+  color: inherit;
+}
+
+.signup_link a {
+  color: #174e7f;
+}
+.signup_link a:hover {
+  color: blue;
+  text-decoration: underline;
+}

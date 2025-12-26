@@ -5,7 +5,7 @@ export default function Index() {
     <div id="Main_div">
       <h1 id="welcomming">Welcome to Easy Meal</h1>
       <p id="welcomming_p">Your solution for easy meal planning!</p>
-      <a href="/Signup">
+      <a href="/Signin">
         <button id="index_button">Get Started</button>
       </a>
     </div>
